@@ -219,26 +219,6 @@ void xml2json::fixup_json(ptree &pt, int depth)
         ptree &ctree = it->second;
 
         fixup_json(ctree, depth + 1);
-        continue;
-
-
-        // remove <xmlattr> nodes, bring all the attributes up to this level
-        ptree::iterator it2 = ctree.begin();
-        if (it2->first.compare("<xmlattr>") == 0)
-        {
-//            std::vector<std::pair<string, string>> kv;
-
-            for (ptree::iterator pos2 = it2->second.begin(); pos2 != it2->second.end(); pos2++)
-//                kv.push_back(make_pair(pos2->first, pos2->second.data()));
-                  ctree.insert(it2, ptree::value_type(pos2->first, pos2->second.data()));
-
-            it2->second.clear();
-
-            ctree.erase("<xmlattr>");
-
-//            for (std::vector<std::pair<string, string>>::iterator m = kv.begin(); m != kv.end(); m++)
-//                ctree.add(m->first, m->second.data());
-        }
     }
 }
 
@@ -279,7 +259,9 @@ bool xml2json::outputJSON(string outFilename)
     try {
         outfile.open (outFilename);
 
-#if 0
+#if DEVICE
+
+        // each line is one device stream
         ptree& devices = m_ptree.get_child("MTConnectStreams.Streams");
         for (ptree::iterator pos = devices.begin(); pos != devices.end(); pos++)
         {
@@ -287,8 +269,9 @@ bool xml2json::outputJSON(string outFilename)
             printTree(pos->second, 0, outfile);
             outfile << "}\n";
         }
-#endif
+#else
 
+        // each line is one component stream
         ptree& devices = m_ptree.get_child("MTConnectStreams.Streams");
         for (ptree::iterator pos = devices.begin(); pos != devices.end(); pos++)
         {
@@ -311,6 +294,8 @@ bool xml2json::outputJSON(string outFilename)
                 }
             }
         }
+#endif
+
     }
     catch (exception& e)
     {
