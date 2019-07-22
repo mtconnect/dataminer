@@ -7,6 +7,7 @@ IF (WIN32)
     set(OPENSSL_USE_STATIC_LIBS     TRUE)
 ENDIF()
 
+project(dataminer)
 cmake_minimum_required(VERSION 3.12)
 FIND_PACKAGE( Boost REQUIRED COMPONENTS thread filesystem)
 FIND_PACKAGE( OpenSSL REQUIRED)
@@ -17,6 +18,33 @@ ADD_EXECUTABLE(dataminer dataminer.cpp xml2json.cpp httpreader.cpp )
 
 IF (WIN32)
     TARGET_LINK_LIBRARIES( dataminer LINK_PUBLIC ${Boost_LIBRARIES} Boost::thread Boost::filesystem OpenSSL::SSL ${OPENSSL_CRYPTO_LIBRARY} ws2_32 mswsock advapi32)
+
+    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION "bin" COMPONENT applications)
+
+    #
+    # CPACK macros below here
+    #
+    set (CPACK_GENERATOR NSIS)
+    SET (CPACK_NSIS_MODIFY_PATH ON)
+
 ELSE()
+
     TARGET_LINK_LIBRARIES( dataminer LINK_PUBLIC ${Boost_LIBRARIES} OpenSSL::SSL ${OPENSSL_CRYPTO_LIBRARY})
+
+    install(TARGETS ${PROJECT_NAME} DESTINATION ".")
+
+    set (CPACK_GENERATOR ZIP)
 ENDIF()
+
+set (CPACK_PACKAGE_NAME "dataminer")
+set (CPACK_PACKAGE_VENDOR "MTConnect")
+set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "dataminer - a data collector for MTConnect agents")
+set (CPACK_PACKAGE_VERSION "1.0.0")
+set (CPACK_PACKAGE_VERSION_MAJOR "1")
+set (CPACK_PACKAGE_VERSION_MINOR "0")
+set (CPACK_PACKAGE_VERSION_PATCH "0")
+set (CPACK_PACKAGE_INSTALL_DIRECTORY "MTConnect dataminer")
+
+
+# Must be after the last CPACK macros
+include(CPack)
