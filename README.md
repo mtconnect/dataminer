@@ -62,6 +62,6 @@ You can then start analyzing your data via ELK.
 Binary Releases v1.0.0
 -------
 
-Download [MacOS Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.0.0/binaries/MacOS/dataminer.dmg)
+Download [MacOS Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.0.0/binaries/MacOS/dataminer-1.0.0-Darwin.zip)
 
-Download [Windows Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.0.0/binaries/Windows/dataminer.zip)
+Download [Windows Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.0.0/binaries/Windows/dataminer-1.0.0-win64.zip)
