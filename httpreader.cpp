@@ -116,7 +116,11 @@ void HttpReader::close()
 string HttpReader::read()
 {
     if (m_stream == NULL)
-        return "";
+    {
+        // try to reconnect
+        if (!connect())
+            return "";
+    }
 
     // Declare a container to hold the response
     http::response<http::string_body> res;
