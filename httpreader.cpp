@@ -13,15 +13,11 @@
 namespace beast = boost::beast; // from <boost/beast.hpp>
 namespace http = beast::http;   // from <boost/beast/http.hpp>
 
-
-HttpReader::HttpReader(string uri)
+HttpReader::HttpReader()
 {
-    m_stream = NULL;
+    m_stream = nullptr;
     m_isSSL = false;
     m_lastConnectionTime = 0;
-
-    if (!parseUri(uri))
-        return;
 }
 
 HttpReader::~HttpReader()
@@ -48,7 +44,7 @@ bool HttpReader::connect()
     }
     catch (exception &e)
     {
-        std::cerr << e.what() << endl;
+        std::cerr << "[" << m_host << ":" << m_port << "] " << e.what() << endl;
         return false;
     }
 
@@ -56,7 +52,7 @@ bool HttpReader::connect()
     boost::asio::socket_base::keep_alive option(true);
     m_stream->set_option(option, ec);
 
-    m_lastConnectionTime = time(0);
+    m_lastConnectionTime = time(nullptr);
     return true;
 }
 
@@ -95,7 +91,7 @@ bool HttpReader::connectSSL()
 
 void HttpReader::close()
 {
-    if (m_stream != NULL)
+    if (m_stream != nullptr)
     {
         try {
             beast::error_code ec;
@@ -109,13 +105,14 @@ void HttpReader::close()
             cerr << e.what() << endl;
         }
 
-        m_stream = NULL;
+        m_stream = nullptr;
     }
+    m_lastConnectionTime = 0;
 }
 
 string HttpReader::read()
 {
-    if (m_stream == NULL)
+    if (m_stream == nullptr)
     {
         // try to reconnect
         if (!connect())
@@ -128,7 +125,7 @@ string HttpReader::read()
     try {
 
         // Set up an HTTP GET request message
-        http::request<http::string_body> req{http::verb::get, "/"+m_path, 11};
+        http::request<http::string_body> req{http::verb::get, "/"+m_path + m_query, 11};
         req.set(http::field::host, m_host);
         req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
 
@@ -147,7 +144,7 @@ string HttpReader::read()
     }
     catch(std::exception const& e)
     {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "[" << m_host << ":" << m_port << "] Error: " << e.what() << std::endl;
 
         string respdata = res.body().data();
 
@@ -157,13 +154,13 @@ string HttpReader::read()
         time_t last = m_lastConnectionTime;
         if (!connect())
             std::cerr <<
-                "Fail to reconnect to MT agent from [" << m_host << "]!\n";
+                "[" << m_host << ":" << m_port << "] Fail to reconnect to MT agent!" << std::endl;
         else {
             std::cerr <<
-                "Reconnect to MT agent from [" << m_host << "]!\n";
+                "[" << m_host << ":" << m_port << "] Reconnect to MT agent!"  << std::endl;
 
-            // avoid repeat read errors if reconnect happens within 10 seconds
-            if (m_lastConnectionTime - last > 10)
+            // avoid repeat read errors if reconnect happens within 5 seconds
+            if (m_lastConnectionTime - last > 5)
                 return read();
         }
     }

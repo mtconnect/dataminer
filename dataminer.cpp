@@ -1,117 +1,148 @@
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/chrono.hpp>
+#include <boost/thread.hpp>
+#include <boost/tokenizer.hpp>
 #include <boost/filesystem.hpp>
 
-#include <cstdio>
-#include <ctime>
-#include <cstdlib>
 #include <iostream>
-#include <string>
+#include <fstream>
 
-#include "httpreader.h"
-#include "xml2json.h"
+#include "worker.h"
 
-namespace fs = boost::filesystem;
+using namespace boost;
 
-static int poll_count = 0;
-static string last_sequence = "";
+static Settings settings;
+static string settingsName;
 
-void poll(HttpReader &reader, string &outputLocation)
+static Worker *createWorker(string outputLocation, string uri, string poll)
 {
-    poll_count++;
+    Worker *worker = new Worker();
 
-    string xmlData = reader.read();
+    if (!worker->setup(&settings, outputLocation, uri, poll))
+        return nullptr;
 
-    if (xmlData.length() == 0)
-        return;
-
-    // convert xml to json
-    xml2json x;
-
-    x.setNumericFields({"sequence", "@@data"});
-
-    try {
-        x.process(xmlData);
-    }
-    catch (exception & e)
-    {
-        cerr << e.what() << endl;
-        return;
-    }
-
-#if DEBUG
-    string json = x.getJSON(true);
-
-    cout << json << endl;
-    std::cout << "========== { " << poll_count << " } ==========" << std::endl;
-
-#else
-    // don't output if data has not changed
-    string sequence = x.getJSON_data("MTConnectStreams.Header.<xmlattr>.lastSequence");
-    if (sequence.compare(last_sequence) == 0)
-    {
-        std::cout << "========== { " << poll_count << ": [SKIPPED] last sequence=" << last_sequence << " } ==========" << std::endl;
-        return;
-    }
-    last_sequence = sequence;
-
-    time_t now = time(0);
-    char timestamp[20] = "";
-    strftime (timestamp, 20, "%Y%m%d-%H%M%S", localtime(&now));
-
-    char outFilename[80];
-    sprintf(outFilename, "MTComponentStreams-%s.log", timestamp);
-
-    fs::path dir (outputLocation);
-    fs::path file (outFilename);
-    fs::path fullFilename = dir / file;
-
-    x.outputJSON(fullFilename.string());
-
-    std::cout << "========== { " << poll_count << ": " << outFilename << " } ==========" << std::endl;
-#endif
+    return worker;
 }
 
+static string getSettingsName(string progName)
+{
+    const char* homeDrive = getenv("HOMEDRIVE");
+    const char* homePath = getenv("HOMEPATH");
+    string homeDir = "";
+
+    if (homeDrive != nullptr && homePath != nullptr)
+    {
+        // Windows
+        homeDir = homeDrive;
+        homeDir += homePath;
+    }
+    else {
+        // unix
+        const char *home = getenv("HOME");
+        if (home != nullptr)
+            homeDir = home;
+
+        // homeDir is "" (current directory) if no environment
+    }
+
+
+    boost::filesystem::path dir (homeDir);
+    boost::filesystem::path file (progName + ".settings");
+    boost::filesystem::path fullFilename = dir / file;
+
+    return fullFilename.string();
+}
 
 int main(int argc, char** argv)
 {
     // Check command line arguments.
-    if (argc != 3)
+    if (argc < 2 || argc > 4)
     {
         std::cerr <<
-            "Usage: dataminer <output location> <uri>\n" <<
-            "Example:\n" <<
-            "    dataminer /tmp https://smstestbed.nist.gov/vds/current\n";
-        return -1;
-    }
-    string outputLocation = argv[1];
-    string uri = argv[2];
-
-    if (!boost::filesystem::exists(outputLocation))
-    {
-        std::cerr <<
-            "Location " << outputLocation << " does not exist!\n";
+            "Usage: " << endl <<
+            "    dataminer <output location> <uri> [poll cycle in seconds - defaults is 60]" << endl <<
+            "Example:" << endl <<
+            "    dataminer /tmp https://smstestbed.nist.gov/vds/current" << endl <<
+            "or" << endl <<
+            "    dataminer <config file>" << endl;
         return -1;
     }
 
-    HttpReader reader(uri);
+    settingsName = getSettingsName("dataminer");
+    settings.restore(settingsName);
 
-    if (!reader.connect())
+    std::vector<Worker*> worker_pool;
+
+    boost::thread *bthread = nullptr;
+    if (argc != 2)
     {
-        std::cerr <<
-            "Cannot connect to MT agent from [" << uri << "]!\n";
-        return -1;
+        string outputLocation = argv[1];
+        string uri = argv[2];
+        string poll = argc > 3 ? argv[3] : "60";
+
+        Worker *worker = createWorker(outputLocation, uri, poll);
+
+        worker_pool.push_back(worker);
+
+        bthread = new boost::thread(boost::bind(&Worker::run, worker));
+
     }
+    else {
+
+        ifstream in(argv[1]);
+        if (!in.is_open()) {
+            std::cerr << "Cannot open config file " << argv[1] << "!" << endl;
+            return -1;
+        }
+
+        typedef tokenizer< escaped_list_separator<char> > Tokenizer;
+        vector< string > vec;
+        string line;
+
+        while (getline(in, line))
+        {
+            Tokenizer tok(line);
+            vec.assign(tok.begin(), tok.end());
+
+            unsigned long argc = vec.size();
+
+            // empty line
+            if (argc == 0)
+                continue;
+
+            if (argc != 2 && argc != 3)
+            {
+                std::cerr << "Invalid input [" << line << "]" << endl;
+                return -1;
+            }
+
+            string outputLocation = vec[0];
+
+            if (outputLocation[0] == '#')
+                continue;
+
+            string uri = vec[1];
+            string poll = argc > 2 ? vec[2] : "60";
+
+            Worker *worker = createWorker(outputLocation, uri, poll);
+            worker_pool.push_back(worker);
+
+            bthread = new boost::thread(boost::bind(&Worker::run, worker));
+
+            if (bthread == nullptr)
+                return -1;
+        }
+
+    }
+
+    if (bthread == nullptr)
+        return -1;
 
     while (true)
     {
-        poll(reader, outputLocation);
-        boost::this_thread::sleep_for( boost::chrono::seconds(60) );
+        settings.save(settingsName);
+        boost::this_thread::sleep_for( boost::chrono::seconds(5) );
     }
 
-    reader.close();
-
-    cout << "DONE" << std::endl;
+//    bthread->join();
     return 0;
 }
+

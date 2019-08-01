@@ -9,12 +9,12 @@ ENDIF()
 
 project(dataminer)
 cmake_minimum_required(VERSION 3.12)
-FIND_PACKAGE( Boost REQUIRED COMPONENTS thread filesystem)
+FIND_PACKAGE( Boost REQUIRED COMPONENTS thread filesystem log)
 FIND_PACKAGE( OpenSSL REQUIRED)
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 add_compile_options(-std=c++11)
 
-ADD_EXECUTABLE(dataminer dataminer.cpp xml2json.cpp httpreader.cpp )
+ADD_EXECUTABLE(dataminer dataminer.cpp agenthandler.cpp httpreader.cpp settings.cpp worker.cpp)
 
 IF (WIN32)
     TARGET_LINK_LIBRARIES( dataminer LINK_PUBLIC ${Boost_LIBRARIES} Boost::thread Boost::filesystem OpenSSL::SSL ${OPENSSL_CRYPTO_LIBRARY} ws2_32 mswsock advapi32)
@@ -29,7 +29,7 @@ IF (WIN32)
 
 ELSE()
 
-    TARGET_LINK_LIBRARIES( dataminer LINK_PUBLIC ${Boost_LIBRARIES} OpenSSL::SSL ${OPENSSL_CRYPTO_LIBRARY})
+    TARGET_LINK_LIBRARIES( dataminer LINK_PUBLIC ${Boost_LIBRARIES} OpenSSL::SSL)
 
     install(TARGETS ${PROJECT_NAME} DESTINATION ".")
 
@@ -39,9 +39,9 @@ ENDIF()
 set (CPACK_PACKAGE_NAME "dataminer")
 set (CPACK_PACKAGE_VENDOR "MTConnect")
 set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "dataminer - a data collector for MTConnect agents")
-set (CPACK_PACKAGE_VERSION "1.0.0")
+set (CPACK_PACKAGE_VERSION "1.1.0")
 set (CPACK_PACKAGE_VERSION_MAJOR "1")
-set (CPACK_PACKAGE_VERSION_MINOR "0")
+set (CPACK_PACKAGE_VERSION_MINOR "1")
 set (CPACK_PACKAGE_VERSION_PATCH "0")
 set (CPACK_PACKAGE_INSTALL_DIRECTORY "MTConnect dataminer")
 

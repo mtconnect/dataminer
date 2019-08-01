@@ -59,9 +59,17 @@ ELK Configuration
 
 You can then start analyzing your data via ELK.
 
-Binary Releases v1.0.0
+v1.1.0 Release Notes
+-------
+1. Output data items (sample, event or condition) to individual json records with their associated device/component id attributes.
+2. Determine numeric data items by using info from "probe" request.
+3. Poll data history using "sample" requests and track last request's sequence number so it can recover on restart. If last sequence number is not present, it starts from the snapshot of current data.
+4. Support polling from multiple agents with different frequencies. 
+
+
+Binary Releases v1.1.0
 -------
 
-Download [MacOS Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.0.0/binaries/MacOS/dataminer-1.0.0-Darwin.zip)
+Download [MacOS Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.1.0/binaries/MacOS/dataminer-1.0.0-Darwin.zip)
 
-Download [Windows Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.0.0/binaries/Windows/dataminer-1.0.0-win64.zip)
+Download [Windows Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.1.0/binaries/Windows/dataminer-1.0.0-win64.zip)

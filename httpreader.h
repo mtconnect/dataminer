@@ -37,14 +37,15 @@ private:
     beast::flat_buffer m_buffer;
     net::io_context m_ioc;
 
-    bool parseUri(const string &uri);
     bool connectSSL();
     string readSSL();
 
 public:
-    HttpReader(string uri);
+    HttpReader();
     ~HttpReader();
 
+    void setQuery(string query) { m_query = query; }
+    bool parseUri(const string &uri);
     bool connect();
     void close();
     string read();

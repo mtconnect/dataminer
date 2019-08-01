@@ -1,5 +1,5 @@
-#ifndef XML2JSON_H
-#define XML2JSON_H
+#ifndef AGENTHANDLER_H
+#define AGENTHANDLER_H
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -7,10 +7,12 @@
 #include <iostream>
 #include <set>
 
+#include "settings.h"
+
 using namespace std;
 using boost::property_tree::ptree;
 
-class xml2json
+class agentHandler
 {
 private:
     ptree m_ptree;
@@ -18,26 +20,27 @@ private:
     set<string> m_numericFields;
 
     bool m_pretty;
-    char m_EOL;
+    string m_EOL;
 
 public:
-    xml2json();
+    agentHandler();
 
 private:
     void setPretty(bool isPretty);
     string indent(int level);
     bool isNumeric(const string& string);
-    string validateData(string key, string data);
-    void printTree (ptree &pt, int level, std::ostream & ret);
+    string validateData(string itemId, string key, string data);
+    void lookupNumericFields(ptree ptree);
+    void printTree (Settings *manager, const string &deviceId, const string &deviceUUID, const string &componentId, ptree &pt, int level, string ret, ostream &out);
     void fixup_json(ptree &pt, int depth);
     string getJSON_data(ptree &tree, string path);
 
 public:
-    void setNumericFields(set<string> numericFields);
+    void setProbeInfo(string probeXml);
+    set<string> &getNumericFields() { return m_numericFields; }
     bool process(string xmlText);
-    bool outputJSON(string outFilename);
-    string getJSON(bool pretty);
+    bool outputJSON(Settings *manager, string outFilename);
     string getJSON_data(string path) { return getJSON_data(m_ptree, path); }
 };
 
-#endif // XML2JSON_H
+#endif // AGENTHANDLER_H
