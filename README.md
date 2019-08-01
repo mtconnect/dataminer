@@ -70,6 +70,6 @@ v1.1.0 Release Notes
 Binary Releases v1.1.0
 -------
 
-Download [MacOS Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.1.0/binaries/MacOS/dataminer-1.0.0-Darwin.zip)
+Download [MacOS Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.1.0/binaries/MacOS/dataminer-1.1.0-Darwin.zip)
 
-Download [Windows Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.1.0/binaries/Windows/dataminer-1.0.0-win64.zip)
+Download [Windows Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.1.0/binaries/Windows/dataminer-1.1.0-win64.zip)
