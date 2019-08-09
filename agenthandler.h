@@ -31,7 +31,7 @@ private:
     bool isNumeric(const string& string);
     string validateData(string itemId, string key, string data);
     void lookupNumericFields(ptree ptree);
-    void printTree (Settings *manager, const string &deviceId, const string &deviceUUID, const string &componentId, ptree &pt, int level, string ret, ostream &out);
+    int printTree (Settings *manager, const string &deviceId, const string &deviceUUID, const string &componentId, ptree &pt, int level, string ret, ostream &out);
     void fixup_json(ptree &pt, int depth);
     string getJSON_data(ptree &tree, string path);
 

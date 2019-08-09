@@ -75,8 +75,10 @@ string agentHandler::validateData(string itemId, string key, string data)
     return "\"" + data + "\"";
 }
 
-void agentHandler::printTree (Settings *manager, const string &deviceName, const string &deviceUUID, const string &componentId, ptree &pt, int level, string ret, std::ostream &out)
+int agentHandler::printTree (Settings *manager, const string &deviceName, const string &deviceUUID, const string &componentId, ptree &pt, int level, string ret, std::ostream &out)
 {
+    int rec_count = 0;
+
     if (level)
         ret += m_EOL;
 
@@ -149,6 +151,7 @@ void agentHandler::printTree (Settings *manager, const string &deviceName, const
                     out << ss.str();
 
                     count++;
+                    rec_count++;
                 }
             }
 
@@ -160,7 +163,7 @@ void agentHandler::printTree (Settings *manager, const string &deviceName, const
             if (pos->second.empty())
                 ret += validateData("", key, pos->second.data());
             else
-                printTree(manager, deviceName, deviceUUID, componentId, pos->second, level + 1, ret, out);
+                rec_count += printTree(manager, deviceName, deviceUUID, componentId, pos->second, level + 1, ret, out);
         }
 
         ++pos;
@@ -170,6 +173,8 @@ void agentHandler::printTree (Settings *manager, const string &deviceName, const
     }
 
     ret += indent(level) + "}";
+
+    return rec_count;
 }
 
 
@@ -343,7 +348,7 @@ bool agentHandler::outputJSON(Settings *itemManager, string outputLocation)
                         {
                             string ss;
                             ss = "\"" + s->first + "\": ";
-                            printTree(itemManager, deviceName, deviceUUID, componentId, s->second, 0, ss, outfile);
+                            count += printTree(itemManager, deviceName, deviceUUID, componentId, s->second, 0, ss, outfile);
                         }
                     }
                 }
