@@ -60,7 +60,7 @@ int main(int argc, char** argv)
             "Usage: " << endl <<
             "    dataminer <output location> <uri> [poll cycle in seconds - defaults is 60]" << endl <<
             "Example:" << endl <<
-            "    dataminer /tmp https://smstestbed.nist.gov/vds/current" << endl <<
+            "    dataminer /tmp https://smstestbed.nist.gov/vds" << endl <<
             "or" << endl <<
             "    dataminer <config file>" << endl;
         return -1;

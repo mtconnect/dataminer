@@ -150,7 +150,6 @@ int agentHandler::printTree (Settings *manager, const string &deviceName, const 
 #endif
                     out << ss.str();
 
-                    count++;
                     rec_count++;
                 }
             }
@@ -331,7 +330,7 @@ bool agentHandler::outputJSON(Settings *itemManager, string outputLocation)
             fs::path fullFilename = dir / file;
 
             outfile.open (fullFilename.string());
-            int count = 0;
+            int rec_count = 0;
 
             for (ptree::iterator p = device.begin(); p != device.end(); p++)
             {
@@ -348,13 +347,13 @@ bool agentHandler::outputJSON(Settings *itemManager, string outputLocation)
                         {
                             string ss;
                             ss = "\"" + s->first + "\": ";
-                            count += printTree(itemManager, deviceName, deviceUUID, componentId, s->second, 0, ss, outfile);
+                            rec_count += printTree(itemManager, deviceName, deviceUUID, componentId, s->second, 0, ss, outfile);
                         }
                     }
                 }
             }
 
-            std::cout << "output: [ " << outFilename << " - records: " << count << " ]" << std::endl;
+            std::cout << "output: [ " << outFilename << " - records: " << rec_count << " ]" << std::endl;
             outfile.close();
         }
 
