@@ -80,6 +80,9 @@ int main(int argc, char** argv)
 
         Worker *worker = createWorker(outputLocation, uri, poll);
 
+        if (worker == nullptr)
+            return -1;
+
         worker_pool.push_back(worker);
 
         bthread = new boost::thread(boost::bind(&Worker::run, worker));
@@ -123,6 +126,10 @@ int main(int argc, char** argv)
             string poll = argc > 2 ? vec[2] : "60";
 
             Worker *worker = createWorker(outputLocation, uri, poll);
+
+            if (worker == nullptr)
+                continue;
+
             worker_pool.push_back(worker);
 
             bthread = new boost::thread(boost::bind(&Worker::run, worker));
@@ -142,7 +149,6 @@ int main(int argc, char** argv)
         boost::this_thread::sleep_for( boost::chrono::seconds(5) );
     }
 
-//    bthread->join();
     return 0;
 }
 
