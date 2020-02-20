@@ -75,5 +75,5 @@ v1.1.1 Release Notes
 Pre-built binaries
 -------
 
-MacOS, Ubuntu, Windows and Raspbian pre-built binaries are avaialble in 
+MacOS, Ubuntu, Windows and Raspbian pre-built binaries are available in 
 https://github.com/mtconnect/dataminer/releases
