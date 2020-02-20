@@ -66,10 +66,9 @@ v1.1.0 Release Notes
 3. Poll data history using "sample" requests and track last request's sequence number so it can recover on restart. If last sequence number is not present, it starts from the snapshot of current data.
 4. Support polling from multiple agents with different frequencies. 
 
-
-Binary Releases v1.1.0
+v1.1.1 Release Notes
 -------
+1. Remove various MinGW DLLs dependencies like gcc, stdc++.
+2. Remove prebuilt binaries from the repo. Move them to the release page.
+3. Create prebuilt binaries for Ubuntu and Raspbian
 
-Download [MacOS Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.1.0/binaries/MacOS/dataminer-1.1.0-Darwin.zip)
-
-Download [Windows Installation](https://raw.githubusercontent.com/mtconnect/dataminer/v1.1.0/binaries/Windows/dataminer-1.1.0-win64.zip)
