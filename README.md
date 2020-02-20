@@ -72,3 +72,8 @@ v1.1.1 Release Notes
 2. Remove prebuilt binaries from the repo. Move them to the release page.
 3. Create prebuilt binaries for Ubuntu and Raspbian
 
+Pre-built binaries
+-------
+
+MacOS, Ubuntu, Windows and Raspbian pre-built binaries are avaialble in 
+https://github.com/mtconnect/dataminer/releases
