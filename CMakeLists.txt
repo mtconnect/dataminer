@@ -17,6 +17,8 @@ add_compile_options(-std=c++11)
 ADD_EXECUTABLE(dataminer dataminer.cpp agenthandler.cpp httpreader.cpp settings.cpp worker.cpp)
 
 IF (WIN32)
+    SET(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++ -static")
+
     TARGET_LINK_LIBRARIES( dataminer LINK_PUBLIC ${Boost_LIBRARIES} Boost::thread Boost::filesystem OpenSSL::SSL ${OPENSSL_CRYPTO_LIBRARY} ws2_32 mswsock advapi32)
 
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION "bin" COMPONENT applications)
