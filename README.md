@@ -17,6 +17,9 @@ Here is a screenshot from Kibana displaying XYZ positions of a device in real ti
 
 ![dataminer_Kibana](https://user-images.githubusercontent.com/34289248/61575981-6c413e00-aa88-11e9-8cc7-4c40bc06df43.png)
 
+Also monitor alarms from the devices:
+
+![Alarm Monitor](https://user-images.githubusercontent.com/34289248/75591517-c77eda00-5a34-11ea-83a5-d9e66464551c.png)
 
 Building
 -------
