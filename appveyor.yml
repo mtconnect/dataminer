@@ -21,7 +21,8 @@ matrix:
   
 # skip unsupported combinations
 init:
-- ps: setmac.ps1
+- ps: |-
+     %APPVEYOR_BUILD_FOLDER%\setmac.ps1
 - cmd: |-
     echo %APPVEYOR_BUILD_WORKER_IMAGE%
     echo %MSBUILD_FLAGS%
