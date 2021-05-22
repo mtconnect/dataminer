@@ -26,7 +26,12 @@ init:
     echo %MSBUILD_FLAGS%
 
 before_build:
-- ps: .\setmac.ps1
+- ps: |-
+    echo "Before - NetAdapter Info"
+    Get-NetAdapter -Name *
+    Set-NetAdapter -Name "vEthernet*" -MacAddress "00-11-22-33-44-55" -Confirm:$false
+    echo "After - NetAdapter Info"
+    Get-NetAdapter -Name *
 - cmd: |-
     mkdir build
     cd build
