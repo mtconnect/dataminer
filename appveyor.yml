@@ -26,7 +26,7 @@ init:
     echo %MSBUILD_FLAGS%
 
 before_build:
-- ps: cd %APPVEYOR_BUILD_FOLDER%; setmac.ps1
+- ps: setmac.ps1
 - cmd: |-
     mkdir build
     cd build
