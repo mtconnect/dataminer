@@ -21,10 +21,8 @@ matrix:
   
 # skip unsupported combinations
 init:
+- ps: setmac.ps1
 - cmd: |-
-    Get-NetAdapter -Name *
-    Set-NetAdapter -Name "vEthernet*" -MacAddress "00-11-22-33-44-55" -Confirm:$false
-    Get-NetAdapter -Name *
     echo %APPVEYOR_BUILD_WORKER_IMAGE%
     echo %MSBUILD_FLAGS%
 
