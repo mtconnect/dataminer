@@ -26,6 +26,7 @@ init:
     echo %MSBUILD_FLAGS%
 
 before_build:
+- ps: cd %APPVEYOR_BUILD_FOLDER%; setmac.ps1
 - cmd: |-
     mkdir build
     cd build
@@ -45,7 +46,6 @@ build:
   parallel: true
 
 build_script:
-- ps: cd %APPVEYOR_BUILD_FOLDER%; setmac.ps1
 - cmd: |-
     cd %APPVEYOR_BUILD_FOLDER%\build
     cmake --build . --config Release --target ALL_BUILD -- %MSBUILD_FLAGS%
