@@ -22,6 +22,9 @@ matrix:
 # skip unsupported combinations
 init:
 - cmd: |-
+    Get-NetAdapter -Name *
+    Set-NetAdapter -Name "vEthernet*" -MacAddress "00-11-22-33-44-55" -Confirm:$false
+    Get-NetAdapter -Name *
     echo %APPVEYOR_BUILD_WORKER_IMAGE%
     echo %MSBUILD_FLAGS%
 
@@ -56,8 +59,8 @@ test_script:
 - cmd: ctest -C Release --output-on-failure
 - sh: ctest
 
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   
 only_commits:
   files:
