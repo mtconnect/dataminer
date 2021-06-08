@@ -22,7 +22,6 @@ matrix:
 # skip unsupported combinations
 init:
 - ps: |-
-#    $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
     echo "Before - NetAdapter Info"
     Get-NetAdapter -Name *
     Set-NetAdapter -Name "vEthernet*" -MacAddress "00-11-22-33-44-55" -Confirm:$false
@@ -33,7 +32,7 @@ init:
     echo %MSBUILD_FLAGS%
 
 before_build:
-- ps: |-
+#- ps: |-
 #    $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 #    echo "Before - NetAdapter Info"
 #    Get-NetAdapter -Name *
