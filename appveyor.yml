@@ -1,3 +1,5 @@
+
+
 version: '{build}'
 branches:
   only:
@@ -21,24 +23,18 @@ matrix:
   
 # skip unsupported combinations
 init:
-- ps: |-
-    echo "Before - NetAdapter Info"
-    Get-NetAdapter -Name *
-    Set-NetAdapter -Name "Ethernet*" -MacAddress "8C:85:90:1C:AF:A8" -Confirm:$false
-    echo "After - NetAdapter Info"
-    Get-NetAdapter -Name *
 - cmd: |-
     echo %APPVEYOR_BUILD_WORKER_IMAGE%
     echo %MSBUILD_FLAGS%
 
 before_build:
-#- ps: |-
-#    $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-#    echo "Before - NetAdapter Info"
-#    Get-NetAdapter -Name *
-#    Set-NetAdapter -Name "vEthernet*" -MacAddress "00-11-22-33-44-55" -Confirm:$false
-#    echo "After - NetAdapter Info"
-#    Get-NetAdapter -Name *
+- ps: |-
+    $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    echo "Before - NetAdapter Info"
+    Get-NetAdapter -Name *
+    Set-NetAdapter -Name "vEthernet*" -MacAddress "00-11-22-33-44-55" -Confirm:$false
+    echo "After - NetAdapter Info"
+    Get-NetAdapter -Name *
 - cmd: |-
     mkdir build
     cd build
