@@ -1,20 +1,36 @@
-IF (WIN32)
-    set(Boost_USE_STATIC_LIBS       ON)  # only find static libs
-    set(Boost_USE_MULTITHREADED     ON)
-    set(Boost_USE_STATIC_RUNTIME    OFF)
-    set(Boost_ARCHITECTURE          "-x64")
-    set(Boost_DEBUG                 ON)
-    set(OPENSSL_USE_STATIC_LIBS     TRUE)
-ENDIF()
-
 project(dataminer)
 cmake_minimum_required(VERSION 3.10)
-FIND_PACKAGE( Boost REQUIRED COMPONENTS thread filesystem log)
-FIND_PACKAGE( OpenSSL REQUIRED)
-INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
-add_compile_options(-std=c++11)
+
+find_program(conan conan)
+if(NOT EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    message(STATUS "Generating conan config file in ${CMAKE_BINARY_DIR}.")
+    execute_process(
+        COMMAND ${conan} install ${CMAKE_SOURCE_DIR} -if ${CMAKE_BINARY_DIR}  --build=missing -s build_type=${CMAKE_BUILD_TYPE}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+endif()
+
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(TARGETS)
+
+IF(UNIX)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility-inlines-hidden -fvisibility=hidden")
+ENDIF()
 
 ADD_EXECUTABLE(dataminer dataminer.cpp agenthandler.cpp httpreader.cpp settings.cpp worker.cpp)
+
+target_include_directories(
+  dataminer
+  PUBLIC
+    "${CONAN_INCLUDE_DIRS}"
+    )
+
+target_link_libraries(
+  dataminer
+  PUBLIC
+  CONAN_PKG::boost CONAN_PKG::openssl
+  $<$<PLATFORM_ID:Windows>:shlwapi>
+)
 
 IF (WIN32)
     SET(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++ -static")
@@ -30,8 +46,6 @@ IF (WIN32)
     SET (CPACK_NSIS_MODIFY_PATH ON)
 
 ELSE()
-
-    TARGET_LINK_LIBRARIES( dataminer LINK_PUBLIC ${Boost_LIBRARIES} OpenSSL::SSL)
 
     install(TARGETS ${PROJECT_NAME} DESTINATION ".")
 
