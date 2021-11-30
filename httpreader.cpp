@@ -96,16 +96,19 @@ void HttpReader::close()
         try {
             beast::error_code ec;
             m_stream->shutdown(tcp::socket::shutdown_both, ec);
-            m_buffer.consume(m_buffer.size());
-
-            delete m_stream;
         }
-        catch (exception &e)
+        catch (std::exception& e)
         {
             cerr << e.what() << endl;
         }
 
+        if (m_isSSL)
+            delete (ssl::stream<tcp::socket> *)m_stream;
+        else
+            delete m_stream;
+
         m_stream = nullptr;
+
     }
     m_lastConnectionTime = 0;
 }
