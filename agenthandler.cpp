@@ -322,8 +322,8 @@ bool agentHandler::outputJSON(Settings *itemManager, string outputLocation)
 
             ofstream outfile;
 
-            char outFilename[80];
-            sprintf(outFilename, "MTConnect-%s-%s-%s.log", deviceUUID.c_str(), deviceName.c_str(), timestamp);
+            string outFilename;
+            outFilename =  "MTConnect-" + deviceUUID + "-" + deviceName + "-" + timestamp + ".log";
 
             fs::path dir (outputLocation);
             fs::path file (outFilename);
