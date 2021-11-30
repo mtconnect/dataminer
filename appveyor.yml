@@ -1,0 +1,74 @@
+
+
+version: '{build}'
+branches:
+  only:
+  - master
+image:
+- Visual Studio 2019
+
+configuration:
+- Release
+
+platform:
+- x86
+
+#environment:
+#  matrix:
+#  - arch: Win32
+#  - arch: #does not work, Release|x64 not a valid target
+
+matrix:
+  fast_finish: true
+  
+# skip unsupported combinations
+init:
+- cmd: |-
+    echo %APPVEYOR_BUILD_WORKER_IMAGE%
+    echo %MSBUILD_FLAGS%
+
+before_build:
+- ps: |-
+    $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    echo "Before - NetAdapter Info"
+    Get-NetAdapter -Name *
+    Set-NetAdapter -Name "vEthernet*" -MacAddress "00-11-22-33-44-55" -Confirm:$false
+    echo "After - NetAdapter Info"
+    Get-NetAdapter -Name *
+- cmd: |-
+    mkdir build
+    cd build
+    cmake --version
+    cmake .. -DAGENT_ENABLE_UNITTESTS=ON -DCMAKE_VERBOSE_MAKEFILE=ON
+- sh: export CC=/usr/bin/gcc-9
+- sh: export CXX=/usr/bin/g++-9
+- sh: mkdir build
+- sh: cd build
+- sh: cmake --version
+- sh: cmake .. -DAGENT_ENABLE_UNITTESTS=ON -DCMAKE_VERBOSE_MAKEFILE=ON
+    
+
+build:
+  project: '{APPVEYOR_BUILD_FOLDER}/build'
+  verbosity: minimal
+  parallel: true
+
+build_script:
+- cmd: |-
+    cd %APPVEYOR_BUILD_FOLDER%\build
+    cmake --build . --config Release --target ALL_BUILD -- %MSBUILD_FLAGS%
+- sh: |-
+    cd ${APPVEYOR_BUILD_FOLDER}/build
+    cmake --build . --config Release --target all -- -j4
+
+test_script:
+- cmd: ctest -C Release --output-on-failure
+- sh: ctest
+
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  
+only_commits:
+  files:
+    - CMakeLists.txt
+    - appveyor.yml
