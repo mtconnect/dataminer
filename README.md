@@ -43,7 +43,7 @@ For Windows
 - **conan install . -if build --build=missing -pr conan/profiles/vs64**
 - **conan build . -bf build**
 
-If build successful, dataminer should be generated in the build/bin directory.
+If build successful, dataminer should be generated in the **build/bin** directory.
 
 Usage:
 
