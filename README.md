@@ -24,18 +24,26 @@ Also monitor alarms from the devices:
 Building
 -------
 
-**dataminer** is written in C++ using **boost** and **openssl** libraries. It uses **CMake** as the build system. First download and install them:
+**dataminer** is written in C++ using **boost** and **openssl** libraries. It uses **CMake** and **conan** as the build system. First download and install them:
 
 - [CMake](https://cmake.org)
-- [boost](https://www.boost.org)
-- [openssl](https://www.openssl.org) - This is to support https secure protocol. For Windows, after the build, prepend the location of libcrypto.dll and libssl.dll to the PATH system variable.
+- [conan](https://conan.io/downloads.html). Version must be >1.57 but not >2.0.
 
 Then run these commands:
 
-- **cmake Makefiles.list**
-- **cmake --build . --target all**
+For MacOS
+- **conan install . -if build  --build=missing**
+- **conan build . -bf build**
 
-If build successful, dataminer should be generated in the current directory.
+For Linux
+- **conan install . -if build --build=missing -pr conan/profiles/gcc**
+- **conan build . -bf build**
+
+For Windows
+- **conan install . -if build --build=missing -pr conan/profiles/vs64**
+- **conan build . -bf build**
+
+If build successful, dataminer should be generated in the build/bin directory.
 
 Usage:
 
